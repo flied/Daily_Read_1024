@@ -2,10 +2,9 @@
 
 自动收集自浏览器，每日更新。
 
-### 2026-02-18
-- [百度一下，你就知道](https://github.com/flied/Daily_Read_1024/issues/1) `bookmark`
-  > Link: https://www.baidu.com/
-  > 
-  > test
-  > 
-
+| 日期 | 标题 | URL | 评论 | 标签 |
+| :--- | :--- | :--- | :--- | :--- |
+| 2026-02-18 | 豆瓣 | https://www.douban.com/ | Link:  豆瓣#douban | `bookmark` |
+| 2026-02-18 | V2EX | https://www.v2ex.com/ | Link:  这是v2ex#v2ex#social | `bookmark` |
+| 2026-02-18 | 趙雷 - 程艾影『一路望 跌跌撞 午夜流星何去何往』【動態歌詞】♪ - YouTube | https://www.youtube.com/watch?v=OVsTUqwWFMQ&list=OLAK5uy_mQUk3YF0W9xnWUSdOIeby8yQIXlQuYYVI&index=7 | Link:  我的笔记#music#test | `bookmark` |
+| 2026-02-18 | 百度一下，你就知道 | https://www.baidu.com/ | Link:  test | `bookmark` |
