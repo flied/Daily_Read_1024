@@ -4,6 +4,7 @@
 
 | 日期 | 标题 | URL | 评论 | 标签 |
 | :--- | :--- | :--- | :--- | :--- |
+| 2026-02-18 | 换机求建议（Macbook Pro vs Macbook Air) - V2EX | https://www.v2ex.com/t/1193088#reply29 | Link: | `test` |
 | 2026-02-18 | 最深切的牵挂_百度搜索 | https://www.baidu.com/s?wd=%E6%9C%80%E6%B7%B1%E5%88%87%E7%9A%84%E7%89%B5%E6%8C%82&sa=fyb_n_homepage&rsv_dl=fyb_n_homepage&from=super&cl=3&tn=baidutop10&fr=top1000&rsv_idx=2&hisfilter=1 | Link: | `bookmark` |
 | 2026-02-18 | 豆瓣 | https://www.douban.com/ | Link:  豆瓣#douban | `bookmark` |
 | 2026-02-18 | V2EX | https://www.v2ex.com/ | Link:  这是v2ex#v2ex#social | `bookmark` |
