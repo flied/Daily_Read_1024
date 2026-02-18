@@ -31,7 +31,7 @@ jobs:
             
             [View on GitHub](${{ github.event.issue.html_url }})
 
-      # 2. 自动生成 README (按日期分组)
+      # 2. 自动生成 README (表格格式)
       - name: Update README
         uses: actions/github-script@v6
         with:
@@ -48,37 +48,47 @@ jobs:
               per_page: 100
             });
 
-            // 按日期分组
-            const grouped = {};
-            issues.forEach(issue => {
-              const date = new Date(issue.created_at).toISOString().split('T')[0];
-              if (!grouped[date]) grouped[date] = [];
-              grouped[date].push(issue);
-            });
-
-            // 生成 Markdown
+            // 生成 Markdown 头部
             let content = "# 📚 My Reading List\n\n自动收集自浏览器，每日更新。\n\n";
             
-            for (const date in grouped) {
-              content += `### ${date}\n`;
-              grouped[date].forEach(issue => {
-                const tags = issue.labels.map(l => `\`${l.name}\``).join(' ');
-                // 处理换行，让引用更好看
-                let body = issue.body ? issue.body.replace(/\r\n/g, '\n').replace(/\n/g, '\n  > ') : '';
-                if(body) body = `\n  > ${body}`;
+            // 表格头
+            content += "| 日期 | 标题 | URL | 评论 | 标签 |\n";
+            content += "| :--- | :--- | :--- | :--- | :--- |\n";
+
+            issues.forEach(issue => {
+              const date = new Date(issue.created_at).toISOString().split('T')[0];
+              
+              // 1. 处理标题：移除可能存在的 Markdown 链接语法，只保留纯文本
+              // 简单处理：如果标题里有 [xxx](url)，只取 xxx。这里假设标题就是纯文本，只是预防万一。
+              const title = issue.title.replace(/\[([^\]]+)\]\([^\)]+\)/g, '$1').trim();
+
+              // 2. 处理标签
+              const tags = issue.labels.map(l => `\`${l.name}\``).join(' ');
+
+              // 3. 解析 Body，尝试分离 URL 和 评论
+              // 假设 body 的格式中包含 URL。
+              let url = issue.html_url; // 默认跳回 issue
+              let comment = "";
+              
+              if (issue.body) {
+                // 正则提取 body 中的 http/https 链接
+                const urlMatch = issue.body.match(/(https?:\/\/[^\s\n]+)/);
+                if (urlMatch) {
+                   url = urlMatch[0]; // 提取到的第一个链接作为原文链接
+                   // 评论就是把链接去掉后的剩余内容
+                   comment = issue.body.replace(url, '').trim(); 
+                } else {
+                   // 如果 body 里没有链接，整个 body 都是评论
+                   comment = issue.body.trim();
+                }
                 
-                content += `- [${issue.title}](${issue.html_url}) ${tags}${body}\n`;
-              });
-              content += "\n";
-            }
+                // 清理评论中的换行符，因为表格不支持换行，用 <br> 或者空格代替
+                comment = comment.replace(/[\r\n]+/g, ' ').trim();
+              }
+              
+              // 4. 拼接表格行
+              // 这里的 URL 列如果不希望太长，可以写成 [Link](url) 或者直接放 url
+              content += `| ${date} | ${title} | ${url} | ${comment} | ${tags} |\n`;
+            });
 
             fs.writeFileSync('README.md', content);
-
-      # 3. 提交 README 的更改
-      - name: Commit & Push
-        run: |
-          git config --global user.name 'github-actions[bot]'
-          git config --global user.email 'github-actions[bot]@users.noreply.github.com'
-          git add README.md
-          git commit -m "Auto-update README with latest issues" || echo "No changes"
-          git push
