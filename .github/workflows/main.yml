@@ -17,21 +17,67 @@ jobs:
         uses: actions/checkout@v3
 
       # 1. 发送通知到 Telegram
-      - name: Notify Telegram
-        uses: appleboy/telegram-action@master
+            # 1. 解析内容并发送通知到 Telegram
+      - name: Send Custom Telegram Notification
+        uses: actions/github-script@v6
+        env:
+          TG_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TG_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
         with:
-          to: ${{ secrets.TELEGRAM_CHAT_ID }}
-          token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
-          format: markdown
-          message: |
-            *${{ github.event.issue.title }}*
+          script: |
+            // 1. 获取 Issue 数据
+            const issue = context.payload.issue;
+            const body = issue.body || "";
             
-            ${{ github.event.issue.body }}
+            // 2. 解析 Body 内容 (提取 Comment 和 原始 URL)
+            // 书签格式: Title: ... \n URL: ... \n\n Comment: ...
             
-            [View on GitHub](${{ github.event.issue.html_url }})
+            // 提取原始 URL
+            const urlMatch = body.match(/URL:\s*(https?:\/\/[^\s\n]+)/);
+            const originalUrl = (urlMatch && urlMatch[1]) ? urlMatch[1] : issue.html_url; // 没抓到就用Issue链接兜底
+            
+            // 提取评论
+            const commentMatch = body.match(/Comment:\s*([\s\S]*)/);
+            let comment = (commentMatch && commentMatch[1]) ? commentMatch[1].trim() : "No comment";
+            // 如果评论为空，显示 "RT" (ReTweet的意思) 或者你喜欢的占位符
+            if(!comment) comment = "RT";
+
+            // 3. 处理标签 (转换为 Hashtag 格式)
+            // 例如: ['tag1', 'tag2'] -> "#tag1 #tag2"
+            const tags = issue.labels.map(l => `#${l.name}`).join(' ');
+
+            // 4. 构建 Telegram 消息文本
+            // 第一段: Comment
+            // 第二段: #Labels
+            // 第三段: Original URL
+            const message = `${comment}\n\n${tags}\n\n${originalUrl}`;
+
+            // 5. 调用 Telegram API 发送
+            const token = process.env.TG_BOT_TOKEN;
+            const chatId = process.env.TG_CHAT_ID;
+            
+            if (!token || !chatId) {
+                console.log("Telegram secrets not found, skipping notification.");
+                return;
+            }
+
+            try {
+                await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        chat_id: chatId,
+                        text: message,
+                        disable_web_page_preview: false // 设为 false 以便显示网页预览
+                    })
+                });
+                console.log("Telegram notification sent successfully.");
+            } catch (error) {
+                console.error("Failed to send Telegram notification:", error);
+            }
 
       # 2. 自动生成 README (表格格式)
-            # 2. 自动生成 README (表格格式)
+
       - name: Update README
         uses: actions/github-script@v6
         with:
