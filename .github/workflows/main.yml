@@ -23,7 +23,6 @@ jobs:
           to: ${{ secrets.TELEGRAM_CHAT_ID }}
           token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           format: markdown
-          # 消息格式：标题加粗，换行显示评论，最后附带 GitHub 链接
           message: |
             *${{ github.event.issue.title }}*
             
@@ -58,37 +57,43 @@ jobs:
             issues.forEach(issue => {
               const date = new Date(issue.created_at).toISOString().split('T')[0];
               
-              // 1. 处理标题：移除可能存在的 Markdown 链接语法，只保留纯文本
-              // 简单处理：如果标题里有 [xxx](url)，只取 xxx。这里假设标题就是纯文本，只是预防万一。
-              const title = issue.title.replace(/\[([^\]]+)\]\([^\)]+\)/g, '$1').trim();
+              // 处理标题
+              const title = issue.title.replace(/\[([^\]]+)\]\([^\)]+\)/g, '$1').replace(/\|/g, '-').trim();
 
-              // 2. 处理标签
+              // 处理标签
               const tags = issue.labels.map(l => `\`${l.name}\``).join(' ');
 
-              // 3. 解析 Body，尝试分离 URL 和 评论
-              // 假设 body 的格式中包含 URL。
-              let url = issue.html_url; // 默认跳回 issue
+              // 解析 Body，尝试分离 URL 和 评论
+              let url = issue.html_url; 
               let comment = "";
               
               if (issue.body) {
-                // 正则提取 body 中的 http/https 链接
                 const urlMatch = issue.body.match(/(https?:\/\/[^\s\n]+)/);
                 if (urlMatch) {
-                   url = urlMatch[0]; // 提取到的第一个链接作为原文链接
-                   // 评论就是把链接去掉后的剩余内容
+                   url = urlMatch[0]; 
                    comment = issue.body.replace(url, '').trim(); 
                 } else {
-                   // 如果 body 里没有链接，整个 body 都是评论
                    comment = issue.body.trim();
                 }
-                
-                // 清理评论中的换行符，因为表格不支持换行，用 <br> 或者空格代替
-                comment = comment.replace(/[\r\n]+/g, ' ').trim();
+                // 清理换行符和表格管道符 | (防止破坏表格结构)
+                comment = comment.replace(/[\r\n]+/g, ' ').replace(/\|/g, '-').trim();
               }
               
-              // 4. 拼接表格行
-              // 这里的 URL 列如果不希望太长，可以写成 [Link](url) 或者直接放 url
               content += `| ${date} | ${title} | ${url} | ${comment} | ${tags} |\n`;
             });
 
             fs.writeFileSync('README.md', content);
+
+      # 3. 提交 README 的更改 (这是之前可能漏掉的)
+      - name: Commit & Push
+        run: |
+          git config --global user.name 'github-actions[bot]'
+          git config --global user.email 'github-actions[bot]@users.noreply.github.com'
+          git add README.md
+          # 检查是否有变化，有变化则提交
+          if git diff --staged --quiet; then
+            echo "No changes to commit"
+          else
+            git commit -m "Auto-update README with latest issues"
+            git push
+          fi
