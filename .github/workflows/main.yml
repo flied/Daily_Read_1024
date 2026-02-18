@@ -78,6 +78,7 @@ jobs:
 
       # 2. 自动生成 README (表格格式)
 
+            # 2. 自动生成 README (表格格式)
       - name: Update README
         uses: actions/github-script@v6
         with:
@@ -96,50 +97,41 @@ jobs:
 
             // 生成 Markdown 头部
             let content = "# 📚 My Reading List\n\n自动收集自浏览器，每日更新。\n\n";
-            content += "| 日期 | 标题 | 链接 | 评论 | 标签 |\n";
-            content += "| :--- | :--- | :--- | :--- | :--- |\n";
+            
+            // 表格头：日期 | 标题 | 评论 | 标签
+            content += "| 日期 | 标题 | 评论 | 标签 |\n";
+            content += "| :--- | :--- | :--- | :--- |\n";
 
             issues.forEach(issue => {
               const date = new Date(issue.created_at).toISOString().split('T')[0];
-              
-              // 1. 处理标题 (移除可能存在的 Markdown 链接语法，防止破坏表格)
-              let title = issue.title.replace(/\|/g, '-').trim();
-
-              // 2. 处理标签
-              const tags = issue.labels.map(l => `\`${l.name}\``).join(' ');
-
-              // 3. 解析 Body (关键修改部分)
-              let url = issue.html_url; // 默认为 Issue 地址作为保底
-              let comment = "";
               const body = issue.body || "";
 
-              // 尝试解析书签发送的标准格式
-              // 格式: Title: ... \n URL: ... \n\n Comment: ...
+              // --- 1. 解析原始 URL ---
+              // 优先从 Body 中提取 URL: ...，如果没有则降级使用 Issue 链接
               const urlMatch = body.match(/URL:\s*(https?:\/\/[^\s\n]+)/);
-              const commentMatch = body.match(/Comment:\s*([\s\S]*)/); // 匹配 Comment: 后面的所有内容
+              const url = (urlMatch && urlMatch[1]) ? urlMatch[1] : issue.html_url;
 
-              if (urlMatch && urlMatch[1]) {
-                  url = urlMatch[1];
-              }
-              
-              if (commentMatch && commentMatch[1]) {
-                  comment = commentMatch[1].trim();
-              } else if (!urlMatch) {
-                  // 如果不是标准格式（比如手动提的 Issue），就把整个 body 当评论
-                  comment = body;
-              }
+              // --- 2. 解析标题 ---
+              // 移除标题中可能破坏 Markdown 表格的竖线 |
+              let titleText = issue.title.replace(/\|/g, '-').trim();
+              // 构建 [标题](URL) 格式
+              const titleLink = `[${titleText}](${url})`;
 
-              // 4. 清理数据以适配 Markdown 表格
-              // 将 URL 转换为 Markdown 链接节省空间
-              const urlLink = `[Link](${url})`; 
-              // 清理评论中的换行符和管道符
-              comment = comment.replace(/[\r\n]+/g, ' ').replace(/\|/g, '-').trim();
-              
-              content += `| ${date} | ${title} | ${urlLink} | ${comment} | ${tags} |\n`;
+              // --- 3. 解析评论 ---
+              const commentMatch = body.match(/Comment:\s*([\s\S]*)/);
+              let comment = (commentMatch && commentMatch[1]) ? commentMatch[1].trim() : "";
+              // 清理评论中的换行符和竖线，防止破坏表格结构
+              comment = comment.replace(/[\r\n]+/g, ' ').replace(/\|/g, '-');
+
+              // --- 4. 解析标签 ---
+              // 格式化为 #Tag1 #Tag2
+              const tags = issue.labels.map(l => `\`#${l.name}\``).join(' ');
+
+              // --- 5. 拼接表格行 ---
+              content += `| ${date} | ${titleLink} | ${comment} | ${tags} |\n`;
             });
 
             fs.writeFileSync('README.md', content);
-
       # 3. 提交 README 的更改 (这是之前可能漏掉的)
       - name: Commit & Push
         run: |
