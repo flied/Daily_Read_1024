@@ -1,0 +1,84 @@
+name: Handle New Issue
+
+on:
+  issues:
+    types: [opened] # 当有新 Issue 创建时触发
+  workflow_dispatch: # 允许手动点按钮触发
+
+permissions:
+  contents: write
+  issues: read
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      # 1. 发送通知到 Telegram
+      - name: Notify Telegram
+        uses: appleboy/telegram-action@master
+        with:
+          to: ${{ secrets.TELEGRAM_CHAT_ID }}
+          token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          format: markdown
+          # 消息格式：标题加粗，换行显示评论，最后附带 GitHub 链接
+          message: |
+            *${{ github.event.issue.title }}*
+            
+            ${{ github.event.issue.body }}
+            
+            [View on GitHub](${{ github.event.issue.html_url }})
+
+      # 2. 自动生成 README (按日期分组)
+      - name: Update README
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const fs = require('fs');
+            
+            // 获取所有 open 的 issue，按创建时间倒序
+            const issues = await github.paginate(github.rest.issues.listForRepo, {
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              state: 'open',
+              sort: 'created',
+              direction: 'desc',
+              per_page: 100
+            });
+
+            // 按日期分组
+            const grouped = {};
+            issues.forEach(issue => {
+              const date = new Date(issue.created_at).toISOString().split('T')[0];
+              if (!grouped[date]) grouped[date] = [];
+              grouped[date].push(issue);
+            });
+
+            // 生成 Markdown
+            let content = "# 📚 My Reading List\n\n自动收集自浏览器，每日更新。\n\n";
+            
+            for (const date in grouped) {
+              content += `### ${date}\n`;
+              grouped[date].forEach(issue => {
+                const tags = issue.labels.map(l => `\`${l.name}\``).join(' ');
+                // 处理换行，让引用更好看
+                let body = issue.body ? issue.body.replace(/\r\n/g, '\n').replace(/\n/g, '\n  > ') : '';
+                if(body) body = `\n  > ${body}`;
+                
+                content += `- [${issue.title}](${issue.html_url}) ${tags}${body}\n`;
+              });
+              content += "\n";
+            }
+
+            fs.writeFileSync('README.md', content);
+
+      # 3. 提交 README 的更改
+      - name: Commit & Push
+        run: |
+          git config --global user.name 'github-actions[bot]'
+          git config --global user.email 'github-actions[bot]@users.noreply.github.com'
+          git add README.md
+          git commit -m "Auto-update README with latest issues" || echo "No changes"
+          git push
