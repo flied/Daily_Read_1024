@@ -4,6 +4,7 @@
 
 | 日期 | 标题 | 链接 | 评论 | 标签 |
 | :--- | :--- | :--- | :--- | :--- |
+| 2026-02-18 | 求问各位 V 友们， 2026 年， 50W 理财有哪些产品比较推荐，最好能保证有 3.5%以上 - V2EX | [Link](https://www.v2ex.com/t/1193175#reply4) | 这是一个测试 多行的测试 |  |
 | 2026-02-18 | V2EX | [Link](https://www.v2ex.com/) |  |  |
 | 2026-02-18 | WildAI | [Link](https://bewild.ai/subscribe) | 这是一个测试网很赞 蜗居的还行 | `123` `ert` |
 | 2026-02-18 | 中国第2金!徐梦桃成功卫冕_百度搜索 | [Link](https://www.baidu.com/s?wd=%E4%B8%AD%E5%9B%BD%E7%AC%AC2%E9%87%91%EF%BC%81%E5%BE%90%E6%A2%A6%E6%A1%83%E6%88%90%E5%8A%9F%E5%8D%AB%E5%86%95&sa=fyb_n_homepage&rsv_dl=fyb_n_homepage&from=super&cl=3&tn=baidutop10&fr=top1000&rsv_idx=2&hisfilter=1) | 测试百度 百度新闻 | `test` `news` |
