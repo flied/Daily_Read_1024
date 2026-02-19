@@ -16,9 +16,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      # 1. 发送通知到 Telegram
-            # 1. 解析内容并发送通知到 Telegram
-            # 1. 解析内容并发送通知到 Telegram
+      # 1. 解析内容并发送通知到 Telegram
       - name: Send Custom Telegram Notification
         uses: actions/github-script@v6
         env:
@@ -33,18 +31,24 @@ jobs:
             const urlMatch = body.match(/URL:\s*(https?:\/\/[^\s\n]+)/);
             const originalUrl = (urlMatch && urlMatch[1]) ? urlMatch[1] : issue.html_url; 
             
-            // --- 2. 提取评论 ---
+            // --- 2. 提取评论 (保留换行) ---
             const commentMatch = body.match(/Comment:\s*([\s\S]*)/);
-            let comment = (commentMatch && commentMatch[1]) ? commentMatch[1].trim() : "";
+            let comment = (commentMatch && commentMatch[1]) ? commentMatch[1] : "";
+            // 保留原始换行，Telegram支持\n换行
             
-            // --- 3. 处理标签 (解决第二个标签无法点击的问题) ---
-            // Github 允许 Label 带空格(如 "Read Later")，但 Telegram Hashtag 不支持空格
-            // 策略：将 Label 内部的空格替换为下划线，并在 Label 之间加空格
+            // --- 3. 处理标签 (确保Telegram hashtag可点击) ---
+            // Telegram hashtag规则：#后面跟字母、数字、下划线、中文等，遇到空格就结束
+            // 策略：将Label内部的空格替换为下划线，标签之间用空格分隔
             const tags = issue.labels.map(l => {
-                // 移除可能的非法字符，将空格变下划线
-                const safeName = l.name.trim().replace(/\s+/g, '_'); 
+                // 清理标签名：保留字母、数字、下划线、中文，将其他字符（包括空格）替换为下划线
+                let safeName = l.name.trim()
+                    .replace(/[^\w\u4e00-\u9fa5]/g, '_')  // 将非字母数字下划线中文的字符替换为下划线
+                    .replace(/_+/g, '_')                   // 将多个连续下划线合并为一个
+                    .replace(/^_+|_+$/g, '');              // 移除开头和结尾的下划线
+                // 确保标签名不为空，如果为空则使用默认值
+                if (!safeName) safeName = 'tag';
                 return `#${safeName}`;
-            }).join(' '); // 这里确保每个标签之间有空格
+            }).join(' '); // 标签之间用空格分隔，Telegram会自动识别每个独立的#word为hashtag
 
             // --- 4. 构建消息 ---
             // 使用数组过滤空内容，然后用单换行符连接，去除中间空行
@@ -77,8 +81,6 @@ jobs:
             }
 
       # 2. 自动生成 README (表格格式)
-
-            # 2. 自动生成 README (表格格式)
       - name: Update README
         uses: actions/github-script@v6
         with:
@@ -117,11 +119,11 @@ jobs:
               // 构建 [标题](URL) 格式
               const titleLink = `[${titleText}](${url})`;
 
-              // --- 3. 解析评论 ---
+              // --- 3. 解析评论 (保留换行，使用HTML换行标签) ---
               const commentMatch = body.match(/Comment:\s*([\s\S]*)/);
-              let comment = (commentMatch && commentMatch[1]) ? commentMatch[1].trim() : "";
-              // 清理评论中的换行符和竖线，防止破坏表格结构
-              comment = comment.replace(/[\r\n]+/g, ' ').replace(/\|/g, '-');
+              let comment = (commentMatch && commentMatch[1]) ? commentMatch[1] : "";
+              // 保留换行：将换行符转换为HTML的<br>标签，同时清理可能破坏表格的竖线
+              comment = comment.replace(/\|/g, '-').replace(/\r\n/g, '<br>').replace(/\n/g, '<br>').replace(/\r/g, '<br>');
 
               // --- 4. 解析标签 ---
               // 格式化为 #Tag1 #Tag2
