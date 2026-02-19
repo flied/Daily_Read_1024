@@ -4,11 +4,4 @@
 
 | 日期 | 标题 | 评论 | 标签 |
 | :--- | :--- | :--- | :--- |
-| 2026-02-19 | [百度一下，你就知道](https://www.baidu.com/) | 12345<br>67890<br>127890 | `#123` `#1234` `#werert` `#yyytt667` |
-| 2026-02-19 | [百度一下，你就知道](https://www.baidu.com/) | 123456<br>123456<br>123 | `#1234` `#12345` `#123456` |
-| 2026-02-19 | [V2EX](https://www.v2ex.com/) | 12345 | `#23456` |
-| 2026-02-19 | [百度一下，你就知道](https://www.baidu.com/) | 1234567<br>qwerty<br>wertyu | `#123` `#456` `#234` |
-| 2026-02-19 | [github - Google 搜索](https://www.google.com/search?gs_ssp=eJzj4tLP1TcoqiwoyE1XYDRgdGDwYkvPLMkoTQIAWC4HFA&q=github&oq=gihub&gs_lcrp=EgZjaHJvbWUqFAgBEC4YChgLGMcBGLEDGNEDGIAEMgYIABBFGDkyFAgBEC4YChgLGMcBGLEDGNEDGIAEMgsIAhAAGAoYCxiABDILCAMQABgKGAsYgAQyCwgEEAAYChgLGIAEMgsIBRAAGAoYCxiABDILCAYQABgKGAsYgAQyBggHEAUYQNIBCDM1MDZqMGo3qAIAsAIA&sourceid=chrome&ie=UTF-8) | iuytrew<br>iuytre<br>876543<br> | `#1243` `#3445` `#5677` |
-| 2026-02-19 | [Home / X](https://x.com/home) | teettetet<br>ttetete1<br>regefe3 | `#123` `#gt` `#4567` |
-| 2026-02-18 | [百度一下](https://www.baidu.com/) | test<br>test1 | `#123` `#456` |
-| 2026-02-18 | [Google](https://www.google.com/) | hello world |  |
+| 2026-02-19 | [响马 on X: "给做记忆系统的同学一个小建议，在记忆信息的同时，记忆角色。每次记忆的时候，分析信息背后的角色，以及角色属性，并将信息按照角色进行分类。角色属性也可以根据交流的深入不断校正和升级。 比如一个人，可以是个程序员，是个开车新手，是个父亲，是个儿子，是个开发部经理，等。" / X](https://x.com/xicilion/status/2024204228688740534) | 记忆信息的时候同时记录产生信息时的角色，信息是在角色身上的。并且可以根据信息不断迭代更新角色的身份 | `#twitter` |
