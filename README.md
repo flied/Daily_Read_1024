@@ -4,6 +4,7 @@
 
 | 日期 | 标题 | 评论 | 标签 |
 | :--- | :--- | :--- | :--- |
+| 2026-02-20 | [Jason Zuo on X: "给我的 AI Agent 升级装上了字节的记忆架构: OpenViking 实战分享" / X](https://x.com/xxx111god/status/2023838143045136557) | memory要上索引，要分层，内容要分层次存储，分层次获取。 | `#memory` |
 | 2026-02-20 | [AI Model & API Providers Analysis - Artificial Analysis](https://artificialanalysis.ai/) | artificialanalysis 大模型榜单要更加详细，除了通用能力，在code和agentic方面有更细致的榜单。 agentic方面，claude 还是处于领先地位。 |  |
 | 2026-02-20 | [Arena Leaderboard - Compare & Benchmark the Best Frontier AI Models](https://arena.ai/zh/leaderboard/) | arena大模型排行榜，略微简略，不含 agentic 榜单 |  |
 | 2026-02-19 | [NotebookLM on X: "Because you wouldn’t let it slide… these are rolling out today for our most requested feature: Prompt-Based Revisions: Tweak, tailor, and tune your slides just by prompting the revisions you want PPTX Support: You can now export your Slide Decks (Google Slides coming next!) https://t.co/Uma36PZ9OF" / X](https://x.com/NotebookLM/status/2023851190102986970) | Notebook 支持做ppt了 | `#twitter` |
